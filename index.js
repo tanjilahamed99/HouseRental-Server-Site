@@ -50,13 +50,19 @@ async function run() {
         })
 
 
-        app.post('/', async (req, res) => {
+        app.post('/jwt', async (req, res) => {
             const userInfo = req.body
-            console.log(userInfo)
             const token = jwt.sign(userInfo, process.env.TOKEN_SECRET, { expiresIn: "1h" })
-            console.log(token)
+            res.send({ token })
+
         })
 
+        app.post('/role', async (req, res) => {
+            const email = req.body.email
+            const query = { email: email }
+            const result = await usersCollection.findOne(query)
+            res.send(result.role)
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
