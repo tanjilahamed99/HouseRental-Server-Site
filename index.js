@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 5000
 const cors = require('cors')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
 
 app.use(cors())
@@ -39,15 +41,22 @@ async function run() {
             const newUser = req.body
             const query = { email: newUser.email }
             const isExist = await usersCollection.findOne(query)
-
             if (isExist) {
                 return res.send({ message: "AllReady Exist" })
             }
-            
             const result = await usersCollection.insertOne(newUser)
             res.send(result)
 
         })
+
+
+        app.post('/', async (req, res) => {
+            const userInfo = req.body
+            console.log(userInfo)
+            const token = jwt.sign(userInfo, process.env.TOKEN_SECRET, { expiresIn: "1h" })
+            console.log(token)
+        })
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
