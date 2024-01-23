@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 // 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = "mongodb+srv://houseRental:yFLiWxJjgBmbIsSn@cluster0.8mn4lkn.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -76,6 +76,69 @@ async function run() {
             const email = req.params.email
             const query = { email: email }
             const result = await houseCollection.find(query).toArray()
+            return res.send(result)
+        })
+
+        app.delete('/myHouse/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await houseCollection.deleteOne(query)
+            return res.send(result)
+        })
+
+        app.get('/updateHouse/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await houseCollection.findOne(query)
+            return res.send(result)
+        })
+
+        app.patch('/myHouse/:id', async (req, res) => {
+
+            const id = req.params.id
+            const updatedData = req.body
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    address: updatedData.address,
+                    city: updatedData.city,
+                    bedrooms: updatedData.bedrooms,
+                    bathrooms: updatedData.bathrooms,
+                    roomSize: updatedData.roomSize,
+                    picture: updatedData.picture,
+                    availabilityDate: updatedData.availabilityDate,
+                    rent: updatedData.rent,
+                    phoneNumber: updatedData.phoneNumber,
+                    desc: updatedData.desc
+                }
+            }
+            const result = await houseCollection.updateOne(query, updatedDoc)
+            return res.send(result)
+
+        })
+
+        // all house data
+        app.get('/allHouse', async (req, res) => {
+            const query = req.query
+            const city = query.city
+            const bedRooms = query.bedRooms
+            const availability = query.availability
+            const roomSize = query.roomSize
+
+
+            // const sortObj = {}
+
+            // if (city ?== '' || city === "undefine") {
+            //     sortObj[] = city
+            // }
+
+            const filter = {}
+
+            if (city) {
+                filter.city = city
+            }
+
+            const result = await houseCollection.find(filter).toArray()
             return res.send(result)
         })
 
