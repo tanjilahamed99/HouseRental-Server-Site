@@ -121,24 +121,40 @@ async function run() {
         app.get('/allHouse', async (req, res) => {
             const query = req.query
             const city = query.city
-            const bedRooms = query.bedRooms
+            const bedrooms = query.bedrooms
             const availability = query.availability
             const roomSize = query.roomSize
+            const roomPrice = query.roomPrice
 
 
-            // const sortObj = {}
+            const sortObj = {}
 
-            // if (city ?== '' || city === "undefine") {
-            //     sortObj[] = city
-            // }
+            if (roomSize !== '' || roomSize === "undefine") {
+                sortObj.roomSize = roomSize
+            }
+            if (roomPrice !== '' || roomSize === "undefine") {
+                sortObj.rent = roomPrice
+            }
+
+            console.log(sortObj)
 
             const filter = {}
 
             if (city) {
                 filter.city = city
             }
+            if (bedrooms) {
+                filter.bedrooms = bedrooms
+            }
+            if (availability !== "undefined") {
+                if (availability === 'true') {
+                    filter.open = true
+                } else {
+                    filter.open = false
+                }
+            }
 
-            const result = await houseCollection.find(filter).toArray()
+            const result = await houseCollection.find(filter).sort(sortObj).toArray()
             return res.send(result)
         })
 
