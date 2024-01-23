@@ -125,10 +125,9 @@ async function run() {
             const availability = query.availability
             const roomSize = query.roomSize
             const roomPrice = query.roomPrice
-
+            const page = query.page
 
             const sortObj = {}
-
             if (roomSize !== '' || roomSize === "undefine") {
                 sortObj.roomSize = roomSize
             }
@@ -136,10 +135,7 @@ async function run() {
                 sortObj.rent = roomPrice
             }
 
-            console.log(sortObj)
-
             const filter = {}
-
             if (city) {
                 filter.city = city
             }
@@ -154,8 +150,15 @@ async function run() {
                 }
             }
 
-            const result = await houseCollection.find(filter).sort(sortObj).toArray()
+            const result = await houseCollection.find(filter).sort(sortObj).skip(page * 10).limit(10).toArray()
             return res.send(result)
+        })
+
+
+        // pagination
+        app.get('/totalData', async (req, res) => {
+            const result = await houseCollection.estimatedDocumentCount()
+            return res.send({ total: result })
         })
 
         // Send a ping to confirm a successful connection
