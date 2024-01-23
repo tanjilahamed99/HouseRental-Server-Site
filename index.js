@@ -35,6 +35,7 @@ async function run() {
         // await client.connect();
 
         const usersCollection = client.db("houseRental").collection("users");
+        const houseCollection = client.db("houseRental").collection("house");
 
 
         app.post('/users', async (req, res) => {
@@ -62,6 +63,20 @@ async function run() {
             const query = { email: email }
             const result = await usersCollection.findOne(query)
             res.send(result.role)
+        })
+
+        // house related APi
+        app.post('/myHouse', async (req, res) => {
+            const newHouse = req.body
+            const result = await houseCollection.insertOne(newHouse)
+            res.send(result)
+        })
+
+        app.get('/myHouse/:email', async (req, res) => {
+            const email = req.params.email
+            const query = { email: email }
+            const result = await houseCollection.find(query).toArray()
+            return res.send(result)
         })
 
         // Send a ping to confirm a successful connection
