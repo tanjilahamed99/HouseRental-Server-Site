@@ -36,7 +36,7 @@ async function run() {
 
         const usersCollection = client.db("houseRental").collection("users");
         const houseCollection = client.db("houseRental").collection("house");
-
+        const purchaseCollection = client.db("houseRental").collection("purchase");
 
         app.post('/users', async (req, res) => {
             const newUser = req.body
@@ -58,11 +58,18 @@ async function run() {
 
         })
 
-        app.post('/role', async (req, res) => {
-            const email = req.body.email
+        app.get('/role/:email', async (req, res) => {
+            const email = req.params.email
             const query = { email: email }
             const result = await usersCollection.findOne(query)
             res.send(result.role)
+        })
+
+        app.get('/purchase/:email', async (req, res) => {
+            const email = req.params.email
+            const query = { email: email }
+            const result = await usersCollection.findOne(query)
+            res.send(result)
         })
 
         // house related APi
@@ -154,11 +161,38 @@ async function run() {
             return res.send(result)
         })
 
+        app.get('/house/:id', async (req, res) => {
+
+        })
+
 
         // pagination
         app.get('/totalData', async (req, res) => {
             const result = await houseCollection.estimatedDocumentCount()
             return res.send({ total: result })
+        })
+
+
+        // purchase
+        app.post('/purchase', async (req, res) => {
+            const purchaseData = req.body
+            const result = await purchaseCollection.insertOne(purchaseData)
+            res.send(result)
+        })
+
+        app.patch('/purchaseDown/:email', async (req, res) => {
+            const email = req.params.email
+            const count = req.body.newCount
+
+            const query = { email: email }
+            const updatedDoc = {
+                $set: {
+
+                    purchaseNumber: count
+                }
+            }
+            const result = await usersCollection.updateOne(query,updatedDoc)
+            res.send(result)
         })
 
         // Send a ping to confirm a successful connection
